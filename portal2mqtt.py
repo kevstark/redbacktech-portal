@@ -14,8 +14,6 @@ import os
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    filename=__name__,
-    filemode='a',
     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
     datefmt='%H:%M:%S',
     level=logging.INFO
@@ -43,8 +41,8 @@ def portal_mqtt_update(client, id, endpoint, data):
 
 if __name__ == "__main__":
     config = {
-        **dotenv.dotenv_values(".env.mqtt"),
-        **dotenv.dotenv_values(".env.redbacktech"),
+        **dotenv.dotenv_values("env/.env.mqtt"),
+        **dotenv.dotenv_values("env/.env.redbacktech"),
         **os.environ,  # override loaded values with environment variables
     }
     mqttc = mqtt.Client(config['MQTT_CLIENT'])
@@ -78,6 +76,7 @@ if __name__ == "__main__":
             data = json.loads(r.text)
             portal_mqtt_update(mqttc, config["REDBACKTECH_SYSID"], endpoint, data)
 
+        pathlib.Path('healthcheck').touch()
         time.sleep(int(config["REDBACKTECH_POLL"]))
 
 
